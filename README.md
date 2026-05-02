@@ -1,4 +1,5 @@
 # US Housing Forecast
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Motivation
