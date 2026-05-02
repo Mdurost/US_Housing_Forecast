@@ -1,8 +1,6 @@
 # US Housing Forecast
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-Forecasting monthly median home prices over the next buying period to inform the best time to buy a home.
-
 ## Motivation
 The COVID-19 pandemic introduced significant changes to the U.S. housing market, including shifts in demand, migration patterns, and economic conditions. These changes drove rapid price growth which caused many individuals to feel home ownership is out of reach. 
 
