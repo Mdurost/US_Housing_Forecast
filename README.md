@@ -28,12 +28,26 @@ Features
   Optional: infrastructure (Docker, AWS, etc.)
 
 ## Installation
-git clone <repo>
-cd <repo>
+
+### Clone Repository
+```bash
+git clone "https://github.com/Mdurost/US_Housing_Forecast.git"
+cd US_Housing_Forecast
+```
+
+### Create environment
+```bash
+python -m venv venv
+# source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate  # Windows
+```
+
+### Install dependcies
+```bash
 pip install -r requirements.txt
+```
 
 ## Usage
-
 Show exactly how to run it:
   python train.py
   python predict.py
