@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Large data files (exceed GitHub's 100MB limit)
+data/processed/
+data/raw/
