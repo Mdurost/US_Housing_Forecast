@@ -11,8 +11,6 @@ This project aims to use housing and economic data to forecast median housing pr
 - **Housing Data:**
   - https://www.realtor.com/research/data/
 - **Economic Indicators:**
-  - https://www.bls.gov/data/
-  - https://www.redfin.com/news/data-center/
   - https://www.freddiemac.com
   
 ## Results
