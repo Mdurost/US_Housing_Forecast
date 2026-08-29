@@ -3,7 +3,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Motivation
-The COVID-19 pandemic introduced significant changes to the U.S. housing market, including shifts in demand, migration patterns, and economic conditions. These changes drove rapid price growth which caused many individuals to feel home ownership is out of reach. 
+The COVID-19 pandemic introduced significant changes to the U.S. housing market, including shifts in demand, migration patterns, and economic conditions. These changes drove rapid price growth which causes many to feel home ownership is out of reach. 
 
 This project aims to use housing and economic data to forecast median housing prices to help first time home buyers understand and time their first home purchase. 
 
@@ -12,6 +12,8 @@ This project aims to use housing and economic data to forecast median housing pr
   - https://www.realtor.com/research/data/
 - **Economic Indicators:**
   - https://www.freddiemac.com
+- **Migration**
+  - https://www2.census.gov/programs-surveys/popest/datasets
   
 ## Results
 Features
