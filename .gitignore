@@ -78,13 +78,6 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Training artifacts
-lightning_logs/
-optuna_test/
-*.ckpt
-!models/
-!models/tft_housing.ckpt
-
 # IPython
 profile_default/
 ipython_config.py
@@ -225,5 +218,16 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Large data files (exceed GitHub's 100MB limit)
-data/processed/
+# Regenerate with data_sourcing_and_cleaning.ipynb
 data/raw/
+data/cleaned/
+data/processed/
+
+# Training artifacts
+lightning_logs/
+checkpoints/
+optuna_test/
+data/studies/optuna_trials/
+*.ckpt
+# Keep only the final exported model
+!models/tft_housing.ckpt
