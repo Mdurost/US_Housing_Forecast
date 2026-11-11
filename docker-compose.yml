@@ -1,0 +1,86 @@
+# Airflow (monthly pipeline) + FastAPI (forecasts and pipeline control).
+#   cp .env.example .env   # then set real secrets
+#   docker compose up -d --build
+# Airflow UI: http://localhost:8080   API docs: http://localhost:8000/docs
+# HOUSING_FORECAST_HOST_DIR (default: this folder) holds data/, models/, outputs/, mlruns/.
+
+services:
+  airflow-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:?set AIRFLOW_DB_PASSWORD in .env}
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+  airflow:
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile
+    image: housing-forecast-airflow:latest
+    command: ["bash", "/opt/airflow/start.sh"]
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@airflow-db/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: ${AIRFLOW_USERNAME:-admin}:admin
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:?set AIRFLOW_JWT_SECRET in .env}
+      AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:?set AIRFLOW_PASSWORD in .env}
+      MLFLOW_TRACKING_URI: sqlite:////app/mlruns/mlflow.db
+      HOUSING_FORECAST_SCHEDULE: ${HOUSING_FORECAST_SCHEDULE:-0 6 15 * *}
+      HOUSING_FORECAST_CLI_ARGS: ${HOUSING_FORECAST_CLI_ARGS:-}
+    volumes:
+      - ./airflow/start.sh:/opt/airflow/start.sh:ro
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/data:/app/data
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/models:/app/models
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/outputs:/app/outputs
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/mlruns:/app/mlruns
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 15s
+      timeout: 10s
+      start_period: 90s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    image: housing-forecast:cpu
+    command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      - airflow
+    environment:
+      HOUSING_FORECAST_API_KEY: ${HOUSING_FORECAST_API_KEY:?set HOUSING_FORECAST_API_KEY in .env}
+      AIRFLOW_API_URL: http://airflow:8080
+      AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD}
+      AIRFLOW_DAG_ID: housing_forecast_monthly
+    volumes:
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/models:/app/models:ro
+      - ${HOUSING_FORECAST_HOST_DIR:-.}/outputs:/app/outputs:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  airflow-db:

@@ -218,10 +218,20 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Large data files (exceed GitHub's 100MB limit)
-# Regenerate with data_sourcing_and_cleaning.ipynb
+# Regenerate with `housing-forecast ingest` (or data_sourcing_and_cleaning.ipynb)
 data/raw/
 data/cleaned/
 data/processed/
+
+# Pipeline outputs (forecasts, evaluation metrics, tuning results)
+outputs/
+
+# MLflow tracking store and local model staging
+mlflow.db
+mlruns/
+mlartifacts/
+models/candidate/
+models/archive/
 
 # Training artifacts
 lightning_logs/

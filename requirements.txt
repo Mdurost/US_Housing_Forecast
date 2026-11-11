@@ -1,53 +1,41 @@
-#Packages and settings
-%load_ext autoreload
-%autoreload 2
-%matplotlib inline
+# Pinned, tested versions (Python 3.13). Install with:
+#   pip install -r requirements.txt
+# For a CUDA build of PyTorch, install torch first from the PyTorch index, e.g.:
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
 
-#basic packages
-import warnings
-import random
-import numpy as np
-import pandas as pd
-import torch
-import seaborn as sns
-import shutil, os
+# Core pipeline
+numpy==2.4.4
+pandas==3.0.2
+requests==2.33.1
+openpyxl==3.1.5
+holidays==0.96
+PyYAML==6.0.3
+torch==2.11.0
+lightning==2.6.1
+pytorch-forecasting==1.7.0
+pytorch_optimizer==3.10.0
+tensorboard==2.20.0
+scikit-learn==1.8.0
+mlflow==3.18.0
 
-#Graphing
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import matplotlib.ticker as mtick
+# Hyperparameter tuning (housing-forecast tune)
+optuna==4.8.0
+optuna-integration==4.8.0
+statsmodels==0.14.6
 
-#pytorch
-import torch
-import torch.serialization
-from torch.utils.data import DataLoader, TensorDataset
-from pytorch_forecasting import Baseline, TemporalFusionTransformer, TimeSeriesDataSet
-from pytorch_forecasting.data import GroupNormalizer
-from pytorch_forecasting.metrics import MAE, SMAPE, PoissonLoss, QuantileLoss
-from pytorch_forecasting.models.temporal_fusion_transformer.tuning import (
-    optimize_hyperparameters,
-)
-import lightning.pytorch as pl
-from lightning.pytorch.callbacks import EarlyStopping, LearningRateMonitor
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.tuner import Tuner
-from pytorch_forecasting.models.temporal_fusion_transformer.tuning import optimize_hyperparameters
-from pytorch_forecasting.metrics import MASE, MAPE, MAE, RMSE
-from pytorch_optimizer import Ranger
-from pytorch_lightning.callbacks import ModelCheckpoint
+# API service (housing-forecast serve)
+fastapi==0.162.4
+uvicorn==0.54.0
+httpx==0.28.1
 
+# Notebooks (EDA / plots)
+matplotlib==3.10.9
+seaborn==0.13.2
+ipykernel==7.2.0
 
-#Tensorflow
-import tensorflow as tf
-import tensorboard as tb
+# Development
+pytest==9.2.0
+ruff==0.17.4
 
-#Misc.
-from typing import List, Optional
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-import holidays
-import pickle
-
-#Ignore warnings
-import logging
-warnings.filterwarnings("ignore")
-logging.disable(logging.CRITICAL)
+# This project, installed in editable mode
+-e .
