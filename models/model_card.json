@@ -1,0 +1,214 @@
+{
+  "created_at": "2026-11-11T15:11:04Z",
+  "mlflow_run_id": "b4c0d131d7af43c5b075a52968849436",
+  "git": {
+    "commit": "be4ad6af207d7aedf8841a22d79248f9bd9f0bda",
+    "dirty": true
+  },
+  "data": {
+    "rows": 375611,
+    "start_date": "2016-07-01",
+    "end_date": "2026-07-01",
+    "n_states": 51,
+    "path": "C:/Users/mduro/Desktop/Coding Projects/Housing Forecast/US_Housing_Forecast/data/processed/processed_data_pre_model.csv",
+    "sha256": "40488486aa238d253e06e8bbcd7c48553c641f675959950a11555e9098d18607"
+  },
+  "best_val_loss": 6079.6826171875,
+  "epochs_trained": 60,
+  "n_parameters": 839826,
+  "config": {
+    "seed": 1,
+    "paths": {
+      "raw_dir": "data/raw",
+      "processed_data": "data/processed/processed_data_pre_model.csv",
+      "model_checkpoint": "models/tft_housing.ckpt",
+      "feature_spec": "models/feature_spec.json",
+      "model_card": "models/model_card.json",
+      "candidate_dir": "models/candidate",
+      "archive_dir": "models/archive",
+      "checkpoint_dir": "checkpoints",
+      "log_dir": "lightning_logs",
+      "output_dir": "outputs"
+    },
+    "sources": {
+      "realtor_core": "https://econdata.s3-us-west-2.amazonaws.com/Reports/Core/RDC_Inventory_Core_Metrics_County_History.csv",
+      "realtor_hotness": "https://econdata.s3-us-west-2.amazonaws.com/Reports/Hotness/RDC_Inventory_Hotness_Metrics_County_History.csv",
+      "mortgage_rates": "https://www.freddiemac.com/pmms/docs/historicalweeklydata.xlsx",
+      "fred_unemployment": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE",
+      "fred_cpi": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL",
+      "fred_building_permits": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=PERMIT",
+      "fred_housing_starts": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=HOUST",
+      "census_population_2010s": "https://www2.census.gov/programs-surveys/popest/datasets/2010-2020/counties/totals/co-est2020-alldata.csv",
+      "census_population_2020s": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/totals/co-est2025-alldata.csv"
+    },
+    "ingest": {
+      "request_timeout_seconds": 120,
+      "max_retries": 3,
+      "economic_min_date": "1948-01-01",
+      "supply_min_date": "1960-01-01",
+      "mortgage_min_date": "2016-01-01",
+      "include_housing_starts": false,
+      "economic_month_fills": {
+        "2025-10-01": "2025-09-01"
+      }
+    },
+    "features": {
+      "target": "median_listing_price",
+      "min_date": "2018-01-01",
+      "corr_threshold": 0.9,
+      "missing_indicator_threshold": 0.01,
+      "identifier_columns": [
+        "county_fips",
+        "city",
+        "county_name",
+        "cbsa_code",
+        "cbsa_title"
+      ],
+      "excluded_unknown_reals": [
+        "year",
+        "time_idx",
+        "quality_flag",
+        "cbsa_code"
+      ]
+    },
+    "dataset": {
+      "max_encoder_length": 36,
+      "min_encoder_length": 18,
+      "max_prediction_length": 12,
+      "batch_size": 128,
+      "val_batch_size_multiplier": 10,
+      "num_workers": 0
+    },
+    "model": {
+      "learning_rate": 0.0002337546936010406,
+      "hidden_size": 70,
+      "attention_head_size": 1,
+      "dropout": 0.23357639741209468,
+      "hidden_continuous_size": 48,
+      "reduce_on_plateau_patience": 4,
+      "log_interval": 10
+    },
+    "trainer": {
+      "accelerator": "auto",
+      "max_epochs": 100,
+      "limit_train_batches": 50,
+      "gradient_clip_val": 0.15761934729549992,
+      "early_stopping_patience": 10,
+      "early_stopping_min_delta": 0.0001
+    },
+    "tuning": {
+      "study_name": "tft_housing_v2",
+      "storage": "sqlite:///data/studies/tft_optuna.db",
+      "trial_dir": "data/studies/optuna_trials",
+      "n_trials": 100,
+      "timeout_hours": 6,
+      "max_epochs": 40,
+      "pruner_min_resource": 5,
+      "pruner_reduction_factor": 3,
+      "lr_finder_min_lr": 1e-06,
+      "lr_finder_max_lr": 10.0,
+      "lr_range_factor": 5,
+      "gradient_clip_val_range": [
+        0.01,
+        1.0
+      ],
+      "hidden_size_range": [
+        16,
+        320
+      ],
+      "hidden_continuous_size_range": [
+        16,
+        128
+      ],
+      "attention_head_size_range": [
+        2,
+        8
+      ],
+      "dropout_range": [
+        0.1,
+        0.4
+      ]
+    },
+    "forecast": {
+      "quantiles_to_report": [
+        0.1,
+        0.5,
+        0.9
+      ]
+    },
+    "tracking": {
+      "enabled": true,
+      "tracking_uri": "sqlite:///mlflow.db",
+      "artifact_location": "mlruns",
+      "experiment_name": "us-housing-tft",
+      "registered_model_name": "us-housing-tft",
+      "champion_alias": "champion"
+    },
+    "promotion": {
+      "metric": "MASE",
+      "baseline_model": "Seasonal naive (12-month)",
+      "min_improvement": 0.0
+    },
+    "project_root": "C:/Users/mduro/Desktop/Coding Projects/Housing Forecast/US_Housing_Forecast"
+  },
+  "holdout": {
+    "data_end_date": "2026-07-01",
+    "metric": "MASE",
+    "candidate": [
+      {
+        "model": "TFT",
+        "MASE": 0.35741984844207764,
+        "MAE": 10703.1162109375,
+        "RMSE": 16438.578125,
+        "MAPE": 2.5202732533216476
+      },
+      {
+        "model": "Persistence",
+        "MASE": 0.5193676948547363,
+        "MAE": 14663.552734375,
+        "RMSE": 20671.626953125,
+        "MAPE": 3.5739734768867493
+      },
+      {
+        "model": "Seasonal naive (12-month)",
+        "MASE": 0.4306388795375824,
+        "MAE": 12585.0048828125,
+        "RMSE": 18742.033203125,
+        "MAPE": 3.0185051262378693
+      }
+    ],
+    "champion": [
+      {
+        "model": "TFT",
+        "MASE": 0.3615451753139496,
+        "MAE": 10941.5458984375,
+        "RMSE": 16864.353515625,
+        "MAPE": 2.5561675429344177
+      },
+      {
+        "model": "Persistence",
+        "MASE": 0.5193676948547363,
+        "MAE": 14663.552734375,
+        "RMSE": 20671.626953125,
+        "MAPE": 3.5739734768867493
+      },
+      {
+        "model": "Seasonal naive (12-month)",
+        "MASE": 0.4306388795375824,
+        "MAE": 12585.0048828125,
+        "RMSE": 18742.033203125,
+        "MAPE": 3.0185051262378693
+      }
+    ],
+    "decision": {
+      "promote": true,
+      "reason": "candidate MASE 0.3574 beats champion 0.3615",
+      "forced": false
+    },
+    "candidate_run_id": "b4c0d131d7af43c5b075a52968849436",
+    "champion_run_id": null,
+    "evaluated_at": "2026-11-11T15:11:10Z"
+  },
+  "promoted_at": "2026-11-11T15:11:10Z",
+  "registered_version": "1"
+}

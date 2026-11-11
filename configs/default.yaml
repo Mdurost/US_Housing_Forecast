@@ -1,0 +1,113 @@
+# Default configuration for the US Housing Forecast pipeline.
+# Relative paths are resolved against the project root (the folder containing
+# pyproject.toml). Any value can be overridden from the CLI, e.g.
+#   housing-forecast --set trainer.max_epochs=5 train
+
+seed: 1
+
+paths:
+  raw_dir: data/raw                                      # dated snapshots of downloaded sources
+  processed_data: data/processed/processed_data_pre_model.csv
+  model_checkpoint: models/tft_housing.ckpt             # champion (production) model used by `predict`
+  feature_spec: models/feature_spec.json                 # fitted feature state saved with the model
+  model_card: models/model_card.json                     # provenance: data hash, git commit, metrics, run id
+  candidate_dir: models/candidate                        # `train` writes here; `promote` copies to models/
+  archive_dir: models/archive                            # previous champions, kept for rollback
+  checkpoint_dir: checkpoints
+  log_dir: lightning_logs
+  output_dir: outputs
+
+sources:
+  realtor_core: https://econdata.s3-us-west-2.amazonaws.com/Reports/Core/RDC_Inventory_Core_Metrics_County_History.csv
+  realtor_hotness: https://econdata.s3-us-west-2.amazonaws.com/Reports/Hotness/RDC_Inventory_Hotness_Metrics_County_History.csv
+  mortgage_rates: https://www.freddiemac.com/pmms/docs/historicalweeklydata.xlsx
+  fred_unemployment: https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE
+  fred_cpi: https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL
+  fred_building_permits: https://fred.stlouisfed.org/graph/fredgraph.csv?id=PERMIT
+  fred_housing_starts: https://fred.stlouisfed.org/graph/fredgraph.csv?id=HOUST
+  census_population_2010s: https://www2.census.gov/programs-surveys/popest/datasets/2010-2020/counties/totals/co-est2020-alldata.csv
+  census_population_2020s: https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/totals/co-est2025-alldata.csv
+
+ingest:
+  request_timeout_seconds: 120
+  max_retries: 3
+  economic_min_date: "1948-01-01"
+  supply_min_date: "1960-01-01"
+  mortgage_min_date: "2016-01-01"
+  # The deployed model was trained without housing starts (the original notebook
+  # dropped them unintentionally). Set to true and retrain to include them.
+  include_housing_starts: false
+  # Months missing from FRED, filled from an earlier month (target: source).
+  economic_month_fills:
+    "2025-10-01": "2025-09-01"
+
+features:
+  target: median_listing_price
+  min_date: "2018-01-01"
+  corr_threshold: 0.90
+  missing_indicator_threshold: 0.01
+  identifier_columns: [county_fips, city, county_name, cbsa_code, cbsa_title]
+  excluded_unknown_reals: [year, time_idx, quality_flag, cbsa_code]
+
+dataset:
+  max_encoder_length: 36
+  min_encoder_length: 18
+  max_prediction_length: 12
+  batch_size: 128
+  val_batch_size_multiplier: 10
+  num_workers: 0
+
+model:
+  learning_rate: 0.0002337546936010406
+  hidden_size: 70
+  attention_head_size: 1
+  dropout: 0.23357639741209468
+  hidden_continuous_size: 48
+  reduce_on_plateau_patience: 4
+  log_interval: 10
+
+trainer:
+  accelerator: auto        # auto | gpu | cpu
+  max_epochs: 100
+  limit_train_batches: 50
+  gradient_clip_val: 0.15761934729549992
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.0001
+
+tuning:
+  study_name: tft_housing_v2
+  storage: sqlite:///data/studies/tft_optuna.db
+  trial_dir: data/studies/optuna_trials
+  n_trials: 100
+  timeout_hours: 6
+  max_epochs: 40
+  pruner_min_resource: 5
+  pruner_reduction_factor: 3
+  lr_finder_min_lr: 1.0e-6
+  lr_finder_max_lr: 10.0
+  lr_range_factor: 5
+  gradient_clip_val_range: [0.01, 1.0]
+  hidden_size_range: [16, 320]
+  hidden_continuous_size_range: [16, 128]
+  attention_head_size_range: [2, 8]
+  dropout_range: [0.1, 0.4]
+
+forecast:
+  quantiles_to_report: [0.1, 0.5, 0.9]
+
+tracking:
+  enabled: true
+  # MLflow backend. Relative sqlite/file paths resolve against the project root.
+  # The MLFLOW_TRACKING_URI environment variable takes precedence (e.g. a remote server).
+  tracking_uri: sqlite:///mlflow.db
+  artifact_location: mlruns
+  experiment_name: us-housing-tft
+  registered_model_name: us-housing-tft
+  champion_alias: champion
+
+promotion:
+  metric: MASE
+  # The candidate must beat this baseline on the hold-out window (null disables the check).
+  baseline_model: Seasonal naive (12-month)
+  # Required relative improvement over the current champion (0.0 = any improvement).
+  min_improvement: 0.0
